@@ -54,26 +54,33 @@ public class TiendaSoftDB {
             }while(flag2!=1);
     }
    public void venta(){
-    double ventas;
+    double ventas, ventas2;
     String temp;
+        if(cantidad==0){
+        System.out.println("Producto Agotado");
+    }
+    else {
     System.out.println("Ingrese la cantidad que quiere comprar: ");
     temp=valor.nextLine();
-    if (isNumeric(temp)){
-    ventas = Integer.parseInt(temp);
-    cantidad=cantidad-ventas;
-        if(cantidad<0){
-            cantidad=cantidad+ventas;
-            System.out.println("Esa cantidad de productos no hay disponibles en este momento");
-        }else {
-            flag=2;
-            ventasTotales=ventasTotales+ventas;
-            ganancias=ventasTotales*precio;
-            System.out.println("Venta realizada");  
-            System.out.println("  ");
-        }
-    }else{
-       System.out.println("Verifique la cantidad ingresada"); 
-       System.out.println("  ");
+
+            if (isNumeric(temp)){
+            ventas = Integer.parseInt(temp);
+            cantidad=cantidad-ventas;
+                if(cantidad<0){
+                    cantidad=cantidad+ventas;
+                    System.out.println("Esa cantidad de productos no hay disponibles en este momento");
+                }else if(cantidad>=0){
+                    flag=2;
+                    ventas2=ventas*precio;
+                    ventasTotales=ventasTotales+ventas;
+                    ganancias=ventasTotales*precio;
+                    System.out.println("Venta realizada");  
+                    System.out.println("Costo de la venta: "+ventas2+"\n");
+                }
+            }else{
+               System.out.println("Verifique la cantidad ingresada"); 
+               System.out.println("  ");
+            }
     }
 }
     public static void main(String[] args) {
