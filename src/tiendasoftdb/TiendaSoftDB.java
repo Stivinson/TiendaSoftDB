@@ -33,30 +33,25 @@ public class TiendaSoftDB {
      }
    public void agregar(){  
        String temp,temp2;
-       int flag2=0;
-       do{
-            System.out.println("Ingrese el Nombre del producto: "); 
+       int flag2=0,flag3=0;
+             System.out.println("Ingrese el Nombre del producto: "); 
             nombre=valor.nextLine();
-            System.out.println("Ingrese La cantidad del producto: ");
-            temp=valor.nextLine();
-            if (isNumeric(temp)){
-                    cantidad = Integer.parseInt(temp);
-            }
+            do{
+                System.out.println("Ingrese La cantidad del producto: ");
+                temp=valor.nextLine();
+                if (isNumeric(temp)){
+                        flag3=1;
+                        cantidad = Integer.parseInt(temp);
+                }else System.out.println("Hay un error, por favor ingrese los datos de manera correcta ");
+            }while(flag3!=1);
+            do{
             System.out.println("Ingrese el precio : "); 
             temp2=valor.nextLine();
-            if (isNumeric(temp2)){
-                    precio = Integer.parseInt(temp2);
-             }
-            if(!isNumeric(temp) || !isNumeric(temp2)){ 
-                flag2=0;
-                System.out.println("Hay un error, por favor ingrese los datos de manera correcta ");
-            }else {
-                flag2=1;
-                System.out.println("Nuevo producto inventariado");
-                System.out.println(" ");            
-            }            
-       }while(flag2==0);
-       
+                if (isNumeric(temp2)){
+                        flag2=1;
+                        precio = Integer.parseInt(temp2);
+                }else System.out.println("Hay un error, por favor ingrese los datos de manera correcta ");
+            }while(flag2!=1);
     }
    public void venta(){
     double ventas;
@@ -98,7 +93,7 @@ public class TiendaSoftDB {
        try{
        System.out.println("Conectando a base de datos... ");
         Class.forName("com.mysql.jdbc.Driver");
-        //Connection con = DriverManager.getConnection(url, user, password);
+        //Connection con = DriverManager.getConnection(url2, user, password);
         Connection con = DriverManager.getConnection(url3, user2, password2);
         System.out.println("Conexion exitosa");
         Statement estado =con.createStatement();
@@ -111,6 +106,7 @@ public class TiendaSoftDB {
                     datos.agregar();
                     //estado.executeUpdate("INSERT INTO `tiendasof`.`inventario` (`id`, `Nombre`, `Cantidad`, `Ventas`, `Precio`, `Ganancias`) VALUES (NULL, '"+datos.nombre+"', '"+datos.cantidad+"', '0', '"+datos.precio+"', '0');");
                     estado.executeUpdate("INSERT INTO `tiendamovil`.`inventario` (`id`, `Nombre`, `Cantidad`, `Ventas`, `Precio`, `Ganancias`) VALUES (NULL, '"+datos.nombre+"', '"+datos.cantidad+"', '0', '"+datos.precio+"', '0');");
+                    System.out.println("Producto Inventariado ");
                     break;
                 case "2":
                     System.out.println("Ingrese el nombre del producto que quiere buscar:  ");
@@ -118,7 +114,7 @@ public class TiendaSoftDB {
                     resultado = estado.executeQuery("SELECT * FROM `inventario` WHERE `Nombre` LIKE '"+nombre+"'");
                     while(resultado.next()){// pregunto si hay algo en la siguiente posicion
                         flag3=1;
-                        System.out.println("Nombre    Cantidad  Ventas Precio  Ganancias");
+                        System.out.println("Nombre    Cantidad  Precio");
                         System.out.println(resultado.getString("Nombre") +"\t"+ resultado.getString("Cantidad")+"\t"+ resultado.getString("Ventas")+"\t"+ resultado.getString("Precio")+"\t"+ resultado.getString("Ganancias"));
                     }
                     if(flag3==0)System.out.println("Ese producto no existe");
@@ -136,11 +132,11 @@ public class TiendaSoftDB {
                     System.out.println("Esta son los productos con los que cuenta la TiendaSoft V2.0");
                     System.out.println("               con Base de Datos online                   ");
                     System.out.println("  "); 
-                    System.out.println("Nombre    Cantidad  Ventas Precio  Ganancias");
+                    System.out.println("Nombre    Cantidad  Precio");
                     System.out.println("  ");
                     resultado = estado.executeQuery("SELECT * FROM `inventario`");
                     while(resultado.next()){// pregunto si hay algo en la siguiente posicion
-                    System.out.println(resultado.getString("Nombre") +"\t"+ resultado.getString("Cantidad")+"\t"+ resultado.getString("Ventas")+"\t"+ resultado.getString("Precio")+"\t"+ resultado.getString("Ganancias"));
+                    System.out.println(resultado.getString("Nombre") +"\t"+ resultado.getString("Cantidad")+"\t"+resultado.getString("Precio"));
                     }
                     break;
                 case "5":
@@ -148,39 +144,43 @@ public class TiendaSoftDB {
                     nombre=valor.next();
                     resultado = estado.executeQuery("SELECT * FROM `inventario` WHERE `Nombre` LIKE '"+nombre+"'");
                     if(resultado.next()){
-                    while(resultado.next()){// pregunto si hay algo en la siguiente posicion
-                        datos.cantidad=resultado.getInt("Cantidad");
-                        datos.ventasTotales=resultado.getInt("Ventas");
-                        datos.precio=resultado.getInt("Precio");
-                        System.out.println("Cantidad: "+datos.cantidad);
-                        System.out.println("ventas: "+datos.ventasTotales);
-                        System.out.println("Precio: "+datos.precio);                    
-                        datos.flag=1;
+                        //while(resultado.next()){// pregunto si hay algo en la siguiente posicion
+                            datos.cantidad=resultado.getInt("Cantidad");
+                            datos.ventasTotales=resultado.getInt("Ventas");
+                            datos.precio=resultado.getInt("Precio");
+                            System.out.println("Cantidad: "+datos.cantidad);
+                            System.out.println("Precio: "+datos.precio);                    
+                            datos.flag=1;
+                        //}
+                        if(datos.flag==1){
+                            datos.venta();
+                            if(datos.flag==2)estado.executeUpdate("UPDATE `inventario` SET `Cantidad`="+datos.cantidad+",`Ventas`="+datos.ventasTotales+",`Ganancias`="+datos.ganancias+" WHERE `Nombre`='"+nombre+"'");
                     }
-                    if(datos.flag==1){
-                        datos.venta();
-                        if(datos.flag==2)estado.executeUpdate("UPDATE `inventario` SET `Ventas`="+datos.ventasTotales+",`Ganancias`="+datos.ganancias+" WHERE `Nombre`='"+nombre+"'");
+                    }else {
+                        System.out.println(" cuatro ");
+                        System.out.println("Ese producto no existe");
                     }
-                    }else System.out.println("Ese producto no existe");
                     datos.flag=0;
                     break;
                 case "6":
                     System.out.println("Ganancias Totales");
                     System.out.println("  ");                    
-                    System.out.println("Nombre    Ventas  Ganancias");
+                    System.out.println("Nombre    Cantidad  Ventas Precio  Ganancias");
                     System.out.println("  ");
                     resultado = estado.executeQuery("SELECT * FROM `inventario`");
                     while(resultado.next()){// pregunto si hay algo en la siguiente posicion
-                    System.out.println(resultado.getString("Nombre") +"\t"+ resultado.getString("Ventas")+"\t"+ resultado.getString("Ganancias"));
+                    System.out.println(resultado.getString("Nombre") +"\t\t"+ resultado.getString("Cantidad")+"\t"+ resultado.getString("Ventas")+"\t"+ resultado.getString("Precio")+"\t"+ resultado.getString("Ganancias"));
                     }
                     break;
-                     
-                default:
+                case "7":
+                    System.out.println("Gracias");
+                    break;
+                    default:
                     System.out.println("Opcion invalida");
                     break;
             }
              flag3=0;
-             }while(!"7".equals(opc));
+           }while(!"7".equals(opc));
                }catch (SQLException ex) {
             System.out.println("Error de mysql");
         }catch(Exception e){
